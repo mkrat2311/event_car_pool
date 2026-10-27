@@ -129,7 +129,7 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 6. **Cost guidance.** Free-text cost note only, or a suggested per-seat share?
 7. **Time field for local legs.** "Depart at" only, or also "arrive by" (useful for the 4:30 AM breakfast crowd and for the 3:30 AM night finishers)?
 8. **Timeline.** Race is 32 days away. Target a working v1 within about a week so people can plan before 27 Nov.
-9. **Sign-in for browsing and contacting.** Currently: sign-in only to post/edit/delete. Should tapping "Chat on WhatsApp" also require sign-in? It protects numbers better but adds friction for riders.
+9. **Sign-in for browsing and contacting.** RESOLVED 27 Oct 2026: browsing is open; tapping "Chat on WhatsApp" requires Google sign-in (protects numbers from scraping). See Decision Log.
 10. **Registration status.** The race site says entries are closed for 30K and both 50K categories; 100K registration closes 1 Nov. This does not affect the app, but participant counts will not grow after that.
 
 ## 13. Milestones (proposed)
@@ -156,4 +156,4 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 | 27 Oct 2026 | App admin: mkrat2311@gmail.com (initial admin allow-list) |
 | 27 Oct 2026 | No custom domain for v1; launch on the host's free address |
 | 27 Oct 2026 | Supabase approved as backend (Postgres + Google auth). New tables: `profiles`, `listings`, `reports`, `admins` (schema in `supabase/001_init.sql`). Admins live in the `admins` table (initial: mkrat2311@gmail.com) |
-| 27 Oct 2026 | PROPOSED, to confirm (§12): tapping Chat on WhatsApp requires Google sign-in, so numbers cannot be scraped. Implemented via `get_contact()` granted to signed-in users only |
+| 27 Oct 2026 | DECIDED by owner: tapping Chat on WhatsApp requires Google sign-in, so numbers cannot be scraped. Implemented via `get_contact()` granted to signed-in users only. Browsing and search stay open |
