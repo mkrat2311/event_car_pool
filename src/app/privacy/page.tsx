@@ -15,8 +15,7 @@ export default function PrivacyPage() {
       <main className="page" style={{ paddingTop: 8, gap: 14 }}>
         <div className="callout warn">
           <p className="fine" style={{ color: "#4a3300" }}>
-            Draft. Review and complete this page, including a contact email,
-            before sharing the app publicly.
+            Draft. Review this page before sharing the app publicly.
           </p>
         </div>
 
@@ -35,7 +34,7 @@ export default function PrivacyPage() {
             <li>Your first name, shown on your rides.</li>
             <li>Your WhatsApp number, used only to open a WhatsApp chat when someone taps Chat on WhatsApp. It is not shown on your listing.</li>
             <li>Ride details you enter: places, date, time, seats, cost note and notes.</li>
-            <li>When Google sign-in is added: your Google name, email and photo. Your email is used only to link rides to you and is never shown to others.</li>
+            <li>When you sign in with Google: your Google name and email. We do not ask for anything else from your Google account. Your email is used only to link rides to you and is never shown to others.</li>
           </ul>
         </section>
 
@@ -57,7 +56,12 @@ export default function PrivacyPage() {
           </p>
         </section>
 
-        <p className="fine">Contact: [add a contact email before launch]</p>
+        <p className="fine">
+          Contact:{" "}
+          <a href="mailto:mkrat2311@gmail.com" style={{ textDecoration: "underline" }}>
+            mkrat2311@gmail.com
+          </a>
+        </p>
       </main>
     </>
   );
