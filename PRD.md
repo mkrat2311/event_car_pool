@@ -161,3 +161,4 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 | 27 Oct 2026 | The event end of a trip is pre-filled on the post form but editable, so people can enter their stay (replaces "event location is fixed and never typed") |
 | 27 Oct 2026 | Ride page shows the route: an "Open in Google Maps" directions link plus an embedded map loaded on tap (Maps Embed API, free). Form hint asks people to pick a landmark or area, not a home address |
 | 27 Oct 2026 | Exact event points replace the approximate ones: home-to-event and return use Malandur village (13.3674679, 75.661607); stay-to-start-line uses the race parking, Mallandur Sunrise & Sunset point (13.3691458, 75.6479445) |
+| 27 Oct 2026 | Find shows all rides for the chosen trip, soonest first. No distance filter or place search (riders can be picked up midway). Date and race dropdowns stay, defaulting to Any. Supersedes the 25 km proximity search |

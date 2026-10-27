@@ -41,7 +41,7 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 ## Location handling
 - Origin and stay come from Google Places autocomplete. Store `place_id`, label, lat, lng.
 - Event locations (Start Area, Sunset Point, etc.) are auto-fetched from Places and stored on the Event. The event end of a trip is pre-filled on the post form but editable (people can enter their stay instead).
-- Search by origin proximity using lat/lng (default 25 km radius), not string matching.
+- Find shows all rides for a trip with no distance filter (riders can be picked up midway). Keep lat/lng on every listing for maps.
 - Keep the Google API key server-side where possible and restrict it by referrer/API.
 
 ## Google Cloud
