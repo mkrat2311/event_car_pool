@@ -101,3 +101,21 @@ export const CheckIcon = (p: IconProps) => (
     <path d="m5 12 5 5 9-10" />
   </Svg>
 );
+
+export const HomeIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 11l9-8 9 8M5 10v10h14V10" />
+  </Svg>
+);
+
+export const FlagIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 21V4M5 4h12l-2 4 2 4H5" />
+  </Svg>
+);
+
+export const ReturnIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3" />
+  </Svg>
+);

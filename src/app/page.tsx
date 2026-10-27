@@ -1,8 +1,29 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
-import { MoonIcon, SunIcon } from "@/components/Icons";
+import { FlagIcon, HomeIcon, ReturnIcon } from "@/components/Icons";
 import { getEvent } from "@/lib/event";
-import { fmtTime, istDateKey } from "@/lib/time";
+import { LEG_LABEL } from "@/lib/types";
+
+const TRIPS = [
+  { Icon: HomeIcon, title: LEG_LABEL.TO_EVENT, text: "From your city to the event town" },
+  { Icon: FlagIcon, title: LEG_LABEL.LOCAL_TO_START, text: "From where you are staying to the start area" },
+  { Icon: ReturnIcon, title: LEG_LABEL.RETURN, text: "From the event back home" },
+];
+
+const STEPS = [
+  {
+    title: "Find or post a ride",
+    text: "Pick a trip. Search rides near you, or post the seats you have or the seat you need.",
+  },
+  {
+    title: "Sign in with Google",
+    text: "Needed to post a ride or open a chat. Browsing is open to everyone.",
+  },
+  {
+    title: "Chat on WhatsApp",
+    text: "Tap Chat on a ride. WhatsApp opens with a message ready to send.",
+  },
+];
 
 export default function HomePage() {
   const ev = getEvent();
@@ -32,11 +53,7 @@ export default function HomePage() {
             <br />
             2026 rides
           </h1>
-          <p className="date">Sat 28 Nov · {ev.town}</p>
-          <p>
-            Find a seat, or share yours, for the trip to the start line. Then
-            continue on WhatsApp.
-          </p>
+          <p>Share a ride, or find one. Then continue on WhatsApp.</p>
           <div className="hero-actions">
             <Link href="/find" className="btn btn-light grow">
               Find a ride
@@ -48,27 +65,18 @@ export default function HomePage() {
         </div>
       </header>
 
-      <main className="page" style={{ gap: 22, paddingTop: 24 }}>
+      <main className="page" style={{ gap: 24, paddingTop: 24 }}>
         <section>
-          <h2 className="section">Races and start times</h2>
+          <h2 className="section">Three trips you can share</h2>
           <div className="list">
-            {ev.categories.map((c) => (
-              <div className="row" key={c.id}>
-                <span className={c.isNight ? "icon-tile night" : "icon-tile"}>
-                  {c.isNight ? <MoonIcon size={22} /> : <SunIcon size={22} />}
+            {TRIPS.map(({ Icon, title, text }) => (
+              <div className="row" key={title}>
+                <span className="icon-tile">
+                  <Icon size={22} />
                 </span>
                 <div className="grow">
-                  <div className="strong">{c.name}</div>
-                  <div className="small">
-                    Finish by {fmtTime(c.cutoffAt)}
-                    {istDateKey(c.cutoffAt) !== istDateKey(c.startAt) ? ", Sun" : ""}
-                  </div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div className="strong">{fmtTime(c.startAt)}</div>
-                  <div className="small" style={{ fontSize: 12 }}>
-                    start
-                  </div>
+                  <div className="strong">{title}</div>
+                  <div className="small">{text}</div>
                 </div>
               </div>
             ))}
@@ -76,34 +84,26 @@ export default function HomePage() {
         </section>
 
         <section>
-          <h2 className="section">Plan your trip</h2>
-          <div className="list">
-            {ev.days.map((d, i) => {
-              const wd = d.short.slice(0, 3);
-              const dd = d.short.split(" ")[1];
-              return (
-                <div className="row" key={d.id} style={{ alignItems: "flex-start" }}>
-                  <div className={i === 1 ? "datebox dark" : "datebox"}>
-                    <span>{wd.toUpperCase()}</span>
-                    <span>{dd}</span>
+          <h2 className="section">How it works</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {STEPS.map((step, i) => (
+              <div key={step.title} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span className="step-num">{i + 1}</span>
+                <div>
+                  <div className="strong" style={{ fontSize: 15 }}>
+                    {step.title}
                   </div>
-                  <div className="grow">
-                    <div className="strong" style={{ fontSize: 15 }}>
-                      {d.title}
-                    </div>
-                    <div className="small" style={{ lineHeight: 1.4 }}>
-                      {d.detail}
-                    </div>
+                  <div className="small" style={{ lineHeight: 1.4 }}>
+                    {step.text}
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </section>
 
         <p className="fine">
-          Rides only. Crew and pacers are not permitted by the race. We only
-          connect people; travel is at your own risk. {ev.sourceNote}{" "}
+          Rides only. We only connect people; travel is at your own risk.{" "}
           <Link href="/privacy" style={{ textDecoration: "underline" }}>
             Privacy
           </Link>

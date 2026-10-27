@@ -157,3 +157,5 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 | 27 Oct 2026 | No custom domain for v1; launch on the host's free address |
 | 27 Oct 2026 | Supabase approved as backend (Postgres + Google auth). New tables: `profiles`, `listings`, `reports`, `admins` (schema in `supabase/001_init.sql`). Admins live in the `admins` table (initial: mkrat2311@gmail.com) |
 | 27 Oct 2026 | DECIDED by owner: tapping Chat on WhatsApp requires Google sign-in, so numbers cannot be scraped. Implemented via `get_contact()` granted to signed-in users only. Browsing and search stay open |
+| 27 Oct 2026 | Home page is minimal: intro, the three trips, and how it works. Race list and "Plan your trip" removed (races stay on the post form) |
+| 27 Oct 2026 | The event end of a trip is pre-filled on the post form but editable, so people can enter their stay (replaces "event location is fixed and never typed") |

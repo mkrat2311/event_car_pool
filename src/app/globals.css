@@ -734,3 +734,17 @@ textarea:focus-visible {
   outline: 3px solid #1e5a3c;
   outline-offset: 2px;
 }
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  background: var(--primary-dark, #14402b);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 14px;
+  font-weight: 700;
+}

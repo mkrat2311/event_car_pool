@@ -23,7 +23,7 @@ import {
   type ListingType,
   type Place,
 } from "@/lib/types";
-import { MinusIcon, PinIcon, PlusIcon } from "./Icons";
+import { MinusIcon, PlusIcon } from "./Icons";
 import PlaceInput from "./PlaceInput";
 import SignInCard from "./SignInCard";
 
@@ -51,6 +51,14 @@ export default function ListingForm({ initial }: Props) {
   const [leg, setLeg] = useState<Leg>(initial?.leg ?? "TO_EVENT");
   const [place, setPlace] = useState<Place | null>(
     initial ? (initial.leg === "RETURN" ? initial.dest : initial.origin) : null,
+  );
+  // The event end of the trip is pre-filled but can be changed, for example to a stay.
+  const [fixed, setFixed] = useState<Place | null>(
+    initial
+      ? initial.leg === "RETURN"
+        ? initial.origin
+        : initial.dest
+      : ev.venue,
   );
   const [categoryId, setCategoryId] = useState<string | null>(
     initial ? initial.categoryId : "50k-day",
@@ -86,21 +94,19 @@ export default function ListingForm({ initial }: Props) {
   function chooseLeg(next: Leg) {
     setLeg(next);
     setPlace(null);
+    setFixed(next === "LOCAL_TO_START" ? ev.parking.place : ev.venue);
     setDate(DEFAULT_DATE[next]);
   }
 
   const cat = ev.categories.find((c) => c.id === categoryId);
 
-  const fixedLabel =
-    leg === "RETURN"
-      ? "Leaving from (filled in for you)"
-      : "Going to (filled in for you)";
-  const fixedValue =
-    leg === "TO_EVENT"
-      ? ev.venue.label
-      : leg === "LOCAL_TO_START"
-        ? ev.parking.label
-        : ev.venue.label;
+  const fixedLabel = leg === "RETURN" ? "Leaving from" : "Going to";
+  const fixedHint =
+    leg === "LOCAL_TO_START"
+      ? `Filled in for you. ${ev.parking.note}. Change it if you are going elsewhere.`
+      : leg === "RETURN"
+        ? "Filled in for you. Change it if you are leaving from your stay."
+        : "Filled in for you. Change it if you are going to your stay.";
   const placeLabel =
     leg === "RETURN"
       ? "Going to"
@@ -115,6 +121,14 @@ export default function ListingForm({ initial }: Props) {
     const digits = phone.replace(/\D/g, "");
     if (!place) {
       setError("Please pick a place from the list.");
+      return;
+    }
+    if (!fixed) {
+      setError(
+        leg === "RETURN"
+          ? "Please pick where you are leaving from."
+          : "Please pick where you are going.",
+      );
       return;
     }
     if (!name.trim()) {
@@ -152,13 +166,8 @@ export default function ListingForm({ initial }: Props) {
       type,
       leg,
       categoryId,
-      origin: leg === "RETURN" ? ev.venue : place,
-      dest:
-        leg === "TO_EVENT"
-          ? ev.venue
-          : leg === "LOCAL_TO_START"
-            ? ev.parking.place
-            : place,
+      origin: leg === "RETURN" ? fixed : place,
+      dest: leg === "RETURN" ? place : fixed,
       departAt: istIso(date, time),
       seats,
       costNote: costNote.trim(),
@@ -178,16 +187,14 @@ export default function ListingForm({ initial }: Props) {
   }
 
   const fixedField = (
-    <div className="field">
-      <label htmlFor="fixed">{fixedLabel}</label>
-      <div className="with-icon">
-        <PinIcon size={20} color="#566a5e" />
-        <input id="fixed" className="input locked" value={fixedValue} readOnly />
-      </div>
-      {leg === "LOCAL_TO_START" ? (
-        <div className="hint">{ev.parking.note}</div>
-      ) : null}
-    </div>
+    <PlaceInput
+      key={`fixed-${leg}`}
+      id="fixed"
+      label={fixedLabel}
+      value={fixed}
+      onChange={setFixed}
+      hint={fixedHint}
+    />
   );
 
   if (supabaseEnabled && !authReady) return <p className="sub">Loading…</p>;

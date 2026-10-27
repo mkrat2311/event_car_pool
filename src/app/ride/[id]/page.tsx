@@ -118,7 +118,7 @@ export default function RideDetailPage() {
               <div>
                 <div className="strong">{listing.dest.label}</div>
                 <div className="small">
-                  {listing.leg === "TO_EVENT"
+                  {listing.dest.label === ev.venue.label
                     ? "Event area, near the Start Area"
                     : LEG_LABEL[listing.leg]}
                 </div>
