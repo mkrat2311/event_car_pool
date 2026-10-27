@@ -159,3 +159,4 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 | 27 Oct 2026 | DECIDED by owner: tapping Chat on WhatsApp requires Google sign-in, so numbers cannot be scraped. Implemented via `get_contact()` granted to signed-in users only. Browsing and search stay open |
 | 27 Oct 2026 | Home page is minimal: intro, the three trips, and how it works. Race list and "Plan your trip" removed (races stay on the post form) |
 | 27 Oct 2026 | The event end of a trip is pre-filled on the post form but editable, so people can enter their stay (replaces "event location is fixed and never typed") |
+| 27 Oct 2026 | Ride page shows the route: an "Open in Google Maps" directions link plus an embedded map loaded on tap (Maps Embed API, free). Form hint asks people to pick a landmark or area, not a home address |

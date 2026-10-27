@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BackIcon, ChatIcon } from "@/components/Icons";
+import RouteMap from "@/components/RouteMap";
 import { getEvent } from "@/lib/event";
 import { initial, seatsLabel } from "@/lib/format";
 import { reportListing, useListings, whatsappUrl } from "@/lib/store";
@@ -141,6 +142,8 @@ export default function RideDetailPage() {
             <span>{LEG_LABEL[listing.leg]}</span>
           </div>
         </div>
+
+        <RouteMap origin={listing.origin} dest={listing.dest} />
 
         {listing.notes ? (
           <div className="card pad">

@@ -249,6 +249,11 @@ export default function ListingForm({ initial }: Props) {
         label={placeLabel}
         value={place}
         onChange={setPlace}
+        hint={
+          leg === "LOCAL_TO_START"
+            ? "Pick your homestay or hotel, or a landmark near it."
+            : "Pick a landmark or area, not your home address. Everyone browsing can see it on a map."
+        }
       />
       {leg !== "RETURN" ? fixedField : null}
 

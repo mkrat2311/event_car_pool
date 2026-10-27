@@ -46,7 +46,7 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 
 ## Google Cloud
 - Project name `event_car_pool`, project ID `event-car-pool` (IDs cannot contain underscores). Owner: mkrat2311@gmail.com.
-- OAuth consent screen app name: "Event Car Pool". APIs: Places API (New); Google sign-in via Supabase.
+- OAuth consent screen app name: "Event Car Pool". APIs: Places API (New), Maps Embed API (route map on the ride page, free); Google sign-in via Supabase. The browser key must allow both APIs.
 - Keys live only in `.env.local` / host environment variables. Never commit them, never paste them in chat or docs.
 
 ## Tech stack (proposed, confirm before building)
