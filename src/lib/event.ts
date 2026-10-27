@@ -4,15 +4,17 @@ import { istIso } from "./time";
 /**
  * Event data pulled from malnadultra.com (checked 27 Oct 2026).
  * Later this comes from the Event / Category / KeyLocation tables.
- * The point below is the race parking, "Mallandur Sunrise & Sunset point" on
- * Google Maps (shared by the organiser contact on 27 Oct 2026). Cars go there
- * for the town and the start line, so route maps end at this point.
+ * Exact points, shared by the owner as Google Maps links on 27 Oct 2026:
+ * - TOWN: "Malandur, Byaravalli" village point, the destination for home-to-event trips.
+ * - PARKING_POINT: "Mallandur Sunrise & Sunset point", the race parking and the
+ *   destination for stay-to-start-line trips.
  */
+const TOWN = { lat: 13.3674679, lng: 75.661607 };
 const PARKING_POINT = { lat: 13.3691458, lng: 75.6479445 };
 
 const VENUE = {
   label: "Mallanduru, Chikkamagaluru",
-  ...PARKING_POINT,
+  ...TOWN,
 };
 
 const EVENT: EventInfo = {
