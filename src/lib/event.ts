@@ -4,13 +4,15 @@ import { istIso } from "./time";
 /**
  * Event data pulled from malnadultra.com (checked 27 Oct 2026).
  * Later this comes from the Event / Category / KeyLocation tables.
- * Coordinates are approximate (the race site's own weather link uses 13.37, 75.66)
- * and are replaced by exact Google Places lookups once the database exists.
+ * The point below is the race parking, "Mallandur Sunrise & Sunset point" on
+ * Google Maps (shared by the organiser contact on 27 Oct 2026). Cars go there
+ * for the town and the start line, so route maps end at this point.
  */
+const PARKING_POINT = { lat: 13.3691458, lng: 75.6479445 };
+
 const VENUE = {
   label: "Mallanduru, Chikkamagaluru",
-  lat: 13.37,
-  lng: 75.66,
+  ...PARKING_POINT,
 };
 
 const EVENT: EventInfo = {
@@ -23,7 +25,7 @@ const EVENT: EventInfo = {
     id: "start-area",
     label: "Start Area, Mallanduru",
     note: "No vehicles are allowed inside the Start Area",
-    place: { label: "Start Area, Mallanduru", lat: VENUE.lat, lng: VENUE.lng },
+    place: { label: "Start Area, Mallanduru", ...PARKING_POINT },
   },
   parking: {
     id: "sunset-point",
@@ -31,8 +33,7 @@ const EVENT: EventInfo = {
     note: "Public parking, a 5-minute walk from the Start Area",
     place: {
       label: "Mallanduru Sunset Point (parking)",
-      lat: VENUE.lat,
-      lng: VENUE.lng,
+      ...PARKING_POINT,
     },
   },
   categories: [

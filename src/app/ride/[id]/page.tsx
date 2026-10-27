@@ -10,7 +10,7 @@ import { initial, seatsLabel } from "@/lib/format";
 import { reportListing, useListings, whatsappUrl } from "@/lib/store";
 import { supabaseEnabled } from "@/lib/supabase/config";
 import { fmtDate, fmtTime } from "@/lib/time";
-import { LEG_LABEL } from "@/lib/types";
+import { LEG_LABEL, type Place } from "@/lib/types";
 
 export default function RideDetailPage() {
   const params = useParams<{ id: string }>();
@@ -72,6 +72,13 @@ export default function RideDetailPage() {
     listing.type === "OFFER"
       ? `Hi ${listing.displayName}, I saw your ride for ${ev.shortName} on ${when}, ${route}. Is a seat still free?`
       : `Hi ${listing.displayName}, I saw your request for a seat for ${ev.shortName} on ${when}, ${route}. I may be able to help. Are you still looking?`;
+  // Event places always use the current exact point, even on older saved rides.
+  const onMap = (p: Place) =>
+    p.label === ev.venue.label
+      ? ev.venue
+      : p.label === ev.parking.place.label
+        ? ev.parking.place
+        : p;
   const mine = listing.ownerId === userId;
   const chatHref = supabaseEnabled
     ? `/connect/${listing.id}?text=${encodeURIComponent(message)}`
@@ -143,7 +150,7 @@ export default function RideDetailPage() {
           </div>
         </div>
 
-        <RouteMap origin={listing.origin} dest={listing.dest} />
+        <RouteMap origin={onMap(listing.origin)} dest={onMap(listing.dest)} />
 
         {listing.notes ? (
           <div className="card pad">
