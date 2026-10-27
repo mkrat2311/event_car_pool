@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseEnabled } from "@/lib/supabase/config";
 
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(list) {
+      setAll(list: { name: string; value: string; options: CookieOptions }[]) {
         for (const { name, value } of list) request.cookies.set(name, value);
         response = NextResponse.next({ request });
         for (const { name, value, options } of list) {
