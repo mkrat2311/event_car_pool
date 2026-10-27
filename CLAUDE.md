@@ -51,10 +51,11 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 
 ## Tech stack (proposed, confirm before building)
 - Next.js 15 (App Router) + TypeScript, plain CSS in `src/app/globals.css` (Tailwind not used so far). PWA support still to add.
-- Supabase (Postgres + Auth with the Google provider), row-level security on (not built yet)
+- Supabase (Postgres + Auth with the Google provider), row-level security on (policies in `supabase/001_init.sql`)
 
 ## Current status
-- Demo mode: all screens work with sample rides in `src/lib/seed.ts`; posted rides live in browser storage (`src/lib/store.ts`). Google sign-in and the database are the next step.
+- Two modes in `src/lib/store.ts`: with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` set, listings live in Supabase and Google sign-in is required to write; without them it runs in demo mode (sample rides from `src/lib/seed.ts`, posts kept in browser storage).
+- Supabase code is written but untested against a real project. Schema: `supabase/001_init.sql`. Needs `npm install` (new deps `@supabase/ssr`, `@supabase/supabase-js`).
 - The code was written in a sandbox that could not install npm packages, so it has been type-checked only against stand-in types. First real `npm install && npm run build` may surface small fixes.
 
 ## Conventions

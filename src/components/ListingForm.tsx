@@ -1,10 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { getEvent } from "@/lib/event";
 import { firstName } from "@/lib/format";
-import { ME, loadProfile, newId, saveProfile, useListings } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
+import {
+  ME,
+  loadAccountProfile,
+  loadProfile,
+  newId,
+  saveAccountProfile,
+  saveProfile,
+  useListings,
+} from "@/lib/store";
+import { supabaseEnabled } from "@/lib/supabase/config";
 import { fmtTime, istDateKey, istIso, istTimeInput } from "@/lib/time";
 import {
   LEG_LABEL,
@@ -15,6 +25,7 @@ import {
 } from "@/lib/types";
 import { MinusIcon, PinIcon, PlusIcon } from "./Icons";
 import PlaceInput from "./PlaceInput";
+import SignInCard from "./SignInCard";
 
 const LEGS: Leg[] = ["TO_EVENT", "LOCAL_TO_START", "RETURN"];
 
@@ -31,7 +42,10 @@ interface Props {
 export default function ListingForm({ initial }: Props) {
   const ev = getEvent();
   const router = useRouter();
+  const pathname = usePathname() ?? "/offer";
   const { add, update } = useListings();
+  const { user, ready: authReady } = useAuth();
+  const [saving, setSaving] = useState(false);
 
   const [type, setType] = useState<ListingType>(initial?.type ?? "OFFER");
   const [leg, setLeg] = useState<Leg>(initial?.leg ?? "TO_EVENT");
@@ -55,11 +69,19 @@ export default function ListingForm({ initial }: Props) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (supabaseEnabled) {
+      if (!user) return;
+      void loadAccountProfile(user.id).then((p) => {
+        setName((cur) => cur || p.name || user.name);
+        setPhone((cur) => cur || p.whatsapp);
+      });
+      return;
+    }
     if (initial) return;
     const p = loadProfile();
     if (p.name) setName(p.name);
     if (p.whatsapp) setPhone(p.whatsapp);
-  }, [initial]);
+  }, [initial, user]);
 
   function chooseLeg(next: Leg) {
     setLeg(next);
@@ -88,7 +110,7 @@ export default function ListingForm({ initial }: Props) {
           ? "Leaving from"
           : "Travelling from";
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
     const digits = phone.replace(/\D/g, "");
     if (!place) {
@@ -103,12 +125,30 @@ export default function ListingForm({ initial }: Props) {
       setError("Enter a 10-digit WhatsApp number.");
       return;
     }
+    if (supabaseEnabled && !user) {
+      setError("Please sign in with Google first.");
+      return;
+    }
     setError("");
-    saveProfile({ name: name.trim(), whatsapp: digits });
+    setSaving(true);
+
+    if (supabaseEnabled && user) {
+      const saved = await saveAccountProfile(user.id, {
+        name: name.trim(),
+        whatsapp: digits,
+      });
+      if (saved) {
+        setError(saved);
+        setSaving(false);
+        return;
+      }
+    } else {
+      saveProfile({ name: name.trim(), whatsapp: digits });
+    }
 
     const listing: Listing = {
       id: initial?.id ?? newId(),
-      ownerId: ME,
+      ownerId: user?.id ?? ME,
       type,
       leg,
       categoryId,
@@ -125,10 +165,15 @@ export default function ListingForm({ initial }: Props) {
       notes: notes.trim(),
       displayName: firstName(name),
       status: initial?.status ?? "ACTIVE",
-      contact: `91${digits}`,
+      // Demo mode only. With the database the number stays in the profile.
+      contact: supabaseEnabled ? undefined : `91${digits}`,
     };
-    if (initial) update(listing);
-    else add(listing);
+    const failed = initial ? await update(listing) : await add(listing);
+    if (failed) {
+      setError(failed);
+      setSaving(false);
+      return;
+    }
     router.push("/my");
   }
 
@@ -144,6 +189,9 @@ export default function ListingForm({ initial }: Props) {
       ) : null}
     </div>
   );
+
+  if (supabaseEnabled && !authReady) return <p className="sub">Loading…</p>;
+  if (supabaseEnabled && !user) return <SignInCard next={pathname} />;
 
   return (
     <form
@@ -311,12 +359,14 @@ export default function ListingForm({ initial }: Props) {
       </div>
 
       <div className="card pad" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div className="callout warn" style={{ padding: "10px 12px" }}>
-          <p className="fine" style={{ color: "#4a3300" }}>
-            Demo mode: Google sign-in comes next. For now your ride is saved in
-            this browser only.
-          </p>
-        </div>
+        {supabaseEnabled ? null : (
+          <div className="callout warn" style={{ padding: "10px 12px" }}>
+            <p className="fine" style={{ color: "#4a3300" }}>
+              Demo mode: Google sign-in comes next. For now your ride is saved in
+              this browser only.
+            </p>
+          </div>
+        )}
         <div className="field">
           <label htmlFor="name">Your name</label>
           <input
@@ -364,8 +414,8 @@ export default function ListingForm({ initial }: Props) {
         </p>
       ) : null}
 
-      <button type="submit" className="btn btn-primary block">
-        {initial ? "Save changes" : "Post ride"}
+      <button type="submit" className="btn btn-primary block" disabled={saving}>
+        {saving ? "Saving…" : initial ? "Save changes" : "Post ride"}
       </button>
     </form>
   );

@@ -155,3 +155,5 @@ Row-level security: anyone can read ACTIVE listings (without the WhatsApp number
 | 27 Oct 2026 | Google Cloud project owned by mkrat2311@gmail.com |
 | 27 Oct 2026 | App admin: mkrat2311@gmail.com (initial admin allow-list) |
 | 27 Oct 2026 | No custom domain for v1; launch on the host's free address |
+| 27 Oct 2026 | Supabase approved as backend (Postgres + Google auth). New tables: `profiles`, `listings`, `reports`, `admins` (schema in `supabase/001_init.sql`). Admins live in the `admins` table (initial: mkrat2311@gmail.com) |
+| 27 Oct 2026 | PROPOSED, to confirm (§12): tapping Chat on WhatsApp requires Google sign-in, so numbers cannot be scraped. Implemented via `get_contact()` granted to signed-in users only |

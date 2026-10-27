@@ -32,6 +32,19 @@ The key must allow **Places API (New)** only, with HTTP referrer restrictions fo
 `http://localhost:3000/*` and your deployed address. `.env.local` is ignored by git;
 never commit a key.
 
+### Supabase and Google sign-in (optional)
+
+Add both values from Supabase (Project Settings, API) to `.env.local` and to Vercel:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+Run `supabase/001_init.sql` once in the Supabase SQL Editor. With these set, listings
+are stored in the database and Google sign-in is required to post. Without them the
+app stays in demo mode.
+
 ## Check it
 
 ```bash

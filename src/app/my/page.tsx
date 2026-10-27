@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
+import SignInCard from "@/components/SignInCard";
 import { EditIcon, TrashIcon } from "@/components/Icons";
 import { getEvent } from "@/lib/event";
 import { seatsLabel } from "@/lib/format";
 import { useListings } from "@/lib/store";
+import { supabaseEnabled } from "@/lib/supabase/config";
 import { fmtDate, fmtTime } from "@/lib/time";
 import type { Listing } from "@/lib/types";
 
@@ -14,20 +17,37 @@ export default function MyListingsPage() {
   const ev = getEvent();
   const { mine, ready, update, remove } = useListings();
   const [tab, setTab] = useState<"active" | "past">("active");
+  const [message, setMessage] = useState("");
+  const { user, ready: authReady, signOut } = useAuth();
 
   const now = Date.now();
   const active = mine.filter((l) => new Date(l.departAt).getTime() >= now);
   const past = mine.filter((l) => new Date(l.departAt).getTime() < now);
   const shown = tab === "active" ? active : past;
 
-  function toggleStatus(l: Listing) {
-    update({ ...l, status: l.status === "ACTIVE" ? "FULL" : "ACTIVE" });
+  async function toggleStatus(l: Listing) {
+    setMessage((await update({ ...l, status: l.status === "ACTIVE" ? "FULL" : "ACTIVE" })) ?? "");
   }
 
-  function confirmDelete(l: Listing) {
+  async function confirmDelete(l: Listing) {
     if (window.confirm("Delete this listing? This cannot be undone.")) {
-      remove(l.id);
+      setMessage((await remove(l.id)) ?? "");
     }
+  }
+
+  if (supabaseEnabled && authReady && !user) {
+    return (
+      <>
+        <main className="page" style={{ gap: 14 }}>
+          <div>
+            <h1 className="title">My listings</h1>
+            <p className="sub">Sign in to see and manage your rides</p>
+          </div>
+          <SignInCard next="/my" />
+        </main>
+        <BottomNav />
+      </>
+    );
   }
 
   return (
@@ -37,6 +57,12 @@ export default function MyListingsPage() {
           <h1 className="title">My listings</h1>
           <p className="sub">Only you can edit or delete these</p>
         </div>
+
+        {message ? (
+          <p className="error" role="alert">
+            {message}
+          </p>
+        ) : null}
 
         <div className="tabs" role="tablist" aria-label="Active or past">
           <button role="tab" aria-selected={tab === "active"} onClick={() => setTab("active")}>
@@ -117,10 +143,21 @@ export default function MyListingsPage() {
           })
         )}
 
-        <p className="fine">
-          Demo mode: your rides are saved in this browser only. Google sign-in,
-          sign out and account deletion arrive in the next step.
-        </p>
+        {supabaseEnabled ? (
+          user ? (
+            <p className="fine">
+              Signed in with Google.{" "}
+              <button type="button" className="linkbtn" onClick={() => void signOut()}>
+                Sign out
+              </button>
+            </p>
+          ) : null
+        ) : (
+          <p className="fine">
+            Demo mode: your rides are saved in this browser only. Google sign-in,
+            sign out and account deletion arrive in the next step.
+          </p>
+        )}
       </main>
       <BottomNav />
     </>

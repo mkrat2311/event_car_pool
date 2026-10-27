@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { BackIcon, ChatIcon } from "@/components/Icons";
 import { getEvent } from "@/lib/event";
 import { initial, seatsLabel } from "@/lib/format";
-import { ME, useListings, whatsappUrl } from "@/lib/store";
+import { reportListing, useListings, whatsappUrl } from "@/lib/store";
+import { supabaseEnabled } from "@/lib/supabase/config";
 import { fmtDate, fmtTime } from "@/lib/time";
 import { LEG_LABEL } from "@/lib/types";
 
@@ -14,8 +15,31 @@ export default function RideDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const ev = getEvent();
-  const { all, ready } = useListings();
+  const router = useRouter();
+  const { all, ready, userId } = useListings();
   const [reported, setReported] = useState(false);
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get("contact");
+    if (c === "slow") setNotice("Too many chats opened in a short time. Please wait a few minutes.");
+    else if (c === "unavailable")
+      setNotice("This person cannot be reached right now. The ride may be full or removed.");
+  }, []);
+
+  async function report(listingId: string) {
+    if (!supabaseEnabled) {
+      setReported(true);
+      return;
+    }
+    if (!userId) {
+      router.push(`/signin?next=${encodeURIComponent(`/ride/${listingId}`)}`);
+      return;
+    }
+    const failed = await reportListing(listingId);
+    if (failed) setNotice(failed);
+    else setReported(true);
+  }
 
   const listing = all.find((l) => l.id === id);
 
@@ -47,7 +71,10 @@ export default function RideDetailPage() {
     listing.type === "OFFER"
       ? `Hi ${listing.displayName}, I saw your ride for ${ev.shortName} on ${when}, ${route}. Is a seat still free?`
       : `Hi ${listing.displayName}, I saw your request for a seat for ${ev.shortName} on ${when}, ${route}. I may be able to help. Are you still looking?`;
-  const mine = listing.ownerId === ME;
+  const mine = listing.ownerId === userId;
+  const chatHref = supabaseEnabled
+    ? `/connect/${listing.id}?text=${encodeURIComponent(message)}`
+    : whatsappUrl(listing, message);
 
   return (
     <>
@@ -141,7 +168,7 @@ export default function RideDetailPage() {
           </Link>
         ) : (
           <a
-            href={whatsappUrl(listing, message)}
+            href={chatHref}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-primary block"
@@ -161,7 +188,9 @@ export default function RideDetailPage() {
         >
           <p className="fine" style={{ maxWidth: 250 }}>
             {reported
-              ? "Thanks. Reported (demo: nothing is sent yet)."
+              ? supabaseEnabled
+                ? "Thanks. We will look at this listing."
+                : "Thanks. Reported (demo: nothing is sent yet)."
               : "Opens WhatsApp. We only connect people; travel is at your own risk."}
           </p>
           {!mine && !reported ? (
@@ -169,13 +198,18 @@ export default function RideDetailPage() {
               type="button"
               className="linkbtn"
               style={{ color: "#a33a2b" }}
-              onClick={() => setReported(true)}
+              onClick={() => void report(listing.id)}
             >
               Report
             </button>
           ) : null}
         </div>
-        {listing.contact || mine ? null : (
+        {notice ? (
+          <p className="error" role="alert" style={{ marginTop: 6 }}>
+            {notice}
+          </p>
+        ) : null}
+        {supabaseEnabled || listing.contact || mine ? null : (
           <p className="fine" style={{ marginTop: 6 }}>
             Sample ride: WhatsApp will ask you to pick a contact. Real listings open the poster&apos;s chat.
           </p>
