@@ -121,7 +121,8 @@ export default function ListBibPage() {
     );
   }
 
-  if (ready && mine.length > 0) {
+  // While saving, the new listing makes mine non-empty; keep the form until we navigate.
+  if (ready && mine.length > 0 && !saving) {
     return (
       <>
         {header}
