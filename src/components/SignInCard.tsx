@@ -17,6 +17,16 @@ export default function SignInCard({ next, failed }: { next: string; failed?: bo
 
   useEffect(() => setEmbedded(inEmbeddedBrowser()), []);
 
+  // Safari restores this page from its back/forward cache with the button still
+  // disabled when someone comes back from Google or WhatsApp. Reset it.
+  useEffect(() => {
+    const reset = (e: PageTransitionEvent) => {
+      if (e.persisted) setBusy(false);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
+
   async function start() {
     setBusy(true);
     setError("");
@@ -62,6 +72,13 @@ export default function SignInCard({ next, failed }: { next: string; failed?: bo
       <button type="button" className="btn btn-primary block" onClick={start} disabled={busy}>
         {busy ? "Opening Google…" : "Continue with Google"}
       </button>
+
+      {busy ? (
+        <p className="fine">
+          Signing you in. This can take a few seconds.
+          {next.startsWith("/connect") ? " WhatsApp opens when it is done." : ""}
+        </p>
+      ) : null}
 
       {error ? (
         <p className="error" role="alert">
