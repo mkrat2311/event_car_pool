@@ -2,7 +2,8 @@ import { fetchBibsServer } from "@/lib/serverData";
 import BibsClient from "./BibsClient";
 
 // Serve a copy with the bibs already in it; the browser refreshes it right away.
-export const revalidate = 15;
+// Render per request (the data fetch itself is cached for 15 s), so a build-time snapshot is never served.
+export const dynamic = "force-dynamic";
 
 export default async function BibsPage() {
   const initial = await fetchBibsServer();
