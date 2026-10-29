@@ -1,7 +1,8 @@
 import Link from "next/link";
 import BottomNav from "@/components/BottomNav";
-import { FlagIcon, HomeIcon, ReturnIcon } from "@/components/Icons";
+import { ChevronIcon, FlagIcon, HomeIcon, ReturnIcon, SwapIcon } from "@/components/Icons";
 import { getEvent } from "@/lib/event";
+import { fmtDate } from "@/lib/time";
 import { LEG_LABEL } from "@/lib/types";
 
 const TRIPS = [
@@ -66,6 +67,30 @@ export default function HomePage() {
       </header>
 
       <main className="page" style={{ gap: 24, paddingTop: 24 }}>
+        <Link
+          href="/bibs"
+          className="row"
+          style={{
+            background: "var(--night-bg)",
+            borderRadius: 16,
+            padding: "12px 14px",
+            color: "#4a3300",
+          }}
+        >
+          <span className="icon-tile" style={{ background: "#fff", color: "var(--night-ink)" }}>
+            <SwapIcon size={22} />
+          </span>
+          <div className="grow">
+            <div className="strong" style={{ fontSize: 15 }}>
+              Bib transfer
+            </div>
+            <div className="small" style={{ color: "#4a3300" }}>
+              Can&apos;t run, or need a bib? Transfers close {fmtDate(ev.bibTransferDeadlineAt)}.
+            </div>
+          </div>
+          <ChevronIcon size={20} />
+        </Link>
+
         <section>
           <h2 className="section">Three trips you can share</h2>
           <div className="list">

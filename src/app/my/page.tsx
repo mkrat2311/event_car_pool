@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth";
 import BottomNav from "@/components/BottomNav";
 import SignInCard from "@/components/SignInCard";
 import { EditIcon, TrashIcon } from "@/components/Icons";
+import { transferEmailUrl, transfersClosed, useBibs } from "@/lib/bibStore";
 import { getEvent } from "@/lib/event";
 import { seatsLabel } from "@/lib/format";
 import { useListings } from "@/lib/store";
@@ -19,6 +20,9 @@ export default function MyListingsPage() {
   const [tab, setTab] = useState<"active" | "past">("active");
   const [message, setMessage] = useState("");
   const { user, ready: authReady, signOut } = useAuth();
+  const bibs = useBibs();
+  const myBib = bibs.mine[0];
+  const myBibCat = myBib ? ev.categories.find((c) => c.id === myBib.categoryId) : undefined;
 
   const now = Date.now();
   const active = mine.filter((l) => new Date(l.departAt).getTime() >= now);
@@ -27,6 +31,20 @@ export default function MyListingsPage() {
 
   async function toggleStatus(l: Listing) {
     setMessage((await update({ ...l, status: l.status === "ACTIVE" ? "FULL" : "ACTIVE" })) ?? "");
+  }
+
+  async function toggleBib() {
+    if (!myBib) return;
+    setMessage(
+      (await bibs.setStatus(myBib.id, myBib.status === "ACTIVE" ? "TAKEN" : "ACTIVE")) ?? "",
+    );
+  }
+
+  async function removeBib() {
+    if (!myBib) return;
+    if (window.confirm("Remove your bib listing? This cannot be undone.")) {
+      setMessage((await bibs.remove(myBib.id)) ?? "");
+    }
   }
 
   async function confirmDelete(l: Listing) {
@@ -62,6 +80,41 @@ export default function MyListingsPage() {
           <p className="error" role="alert">
             {message}
           </p>
+        ) : null}
+
+        {myBib ? (
+          <div className="card pad">
+            <div className="chips" style={{ marginBottom: 8 }}>
+              <span className="chip sm night">Bib transfer</span>
+              <span className={myBib.status === "TAKEN" ? "chip sm dark" : "chip sm"}>
+                {myBib.status === "TAKEN" ? "Taken" : "Live"}
+              </span>
+            </div>
+            <div className="strong">{myBibCat?.name ?? "Your race"}</div>
+            {myBib.note ? (
+              <div className="small" style={{ marginTop: 2 }}>
+                {myBib.note}
+              </div>
+            ) : null}
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button type="button" className="btn btn-outline grow" onClick={() => void toggleBib()}>
+                {myBib.status === "TAKEN" ? "Reopen" : "Mark as taken"}
+              </button>
+              <button type="button" className="btn btn-danger grow" onClick={() => void removeBib()}>
+                <TrashIcon size={18} />
+                Remove
+              </button>
+            </div>
+            {transfersClosed() ? null : (
+              <a
+                href={transferEmailUrl(myBibCat?.name ?? "my race")}
+                className="btn btn-outline block"
+                style={{ marginTop: 8 }}
+              >
+                Email the organisers
+              </a>
+            )}
+          </div>
         ) : null}
 
         <div className="tabs" role="tablist" aria-label="Active or past">

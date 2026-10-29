@@ -92,6 +92,8 @@ const EVENT: EventInfo = {
       detail: "Final cut-off 3:30 AM. Plan your ride home.",
     },
   ],
+  bibTransferDeadlineAt: istIso("2026-11-01", "23:59"),
+  bibTransferEmail: "run@malnadultra.com",
   bibPickupMinutesBefore: 90,
   sourceNote: "Event details from malnadultra.com. This app is unofficial.",
 };

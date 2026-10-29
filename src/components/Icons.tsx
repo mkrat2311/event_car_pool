@@ -119,3 +119,15 @@ export const ReturnIcon = (p: IconProps) => (
     <path d="M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3" />
   </Svg>
 );
+
+export const SwapIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7 7h13l-3-3M17 17H4l3 3" />
+  </Svg>
+);
+
+export const ChevronIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M9 5l7 7-7 7" />
+  </Svg>
+);

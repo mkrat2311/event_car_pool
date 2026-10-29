@@ -41,7 +41,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
-Run `supabase/001_init.sql` once in the Supabase SQL Editor. With these set, listings
+Run `supabase/001_init.sql`, then `supabase/002_bibs.sql` (bib transfer), once each in the Supabase SQL Editor. With these set, listings
 are stored in the database and Google sign-in is required to post. Without them the
 app stays in demo mode.
 

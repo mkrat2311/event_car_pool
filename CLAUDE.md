@@ -28,6 +28,7 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 - **Leg**: `TO_EVENT`, `LOCAL_TO_START`, `RETURN`
 - **Offer** (has seats) / **Request** (needs seats) = **Listing**
 - **Profile**: the signed-in user (Google identity + WhatsApp number)
+- **BibListing**: a runner offering to transfer their bib in the same Category (one per person; closes after the transfer deadline in the Event data)
 
 ## Auth and privacy rules
 - Sign in with Google only, basic scopes only (`openid`, `email`, `profile`).
@@ -55,7 +56,7 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 
 ## Current status
 - Two modes in `src/lib/store.ts`: with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` set, listings live in Supabase and Google sign-in is required to write; without them it runs in demo mode (sample rides from `src/lib/seed.ts`, posts kept in browser storage).
-- Supabase code is written but untested against a real project. Schema: `supabase/001_init.sql`. Needs `npm install` (new deps `@supabase/ssr`, `@supabase/supabase-js`).
+- Supabase code is written but untested against a real project. Schema: `supabase/001_init.sql`, then `supabase/002_bibs.sql` (bib transfer). Needs `npm install` (new deps `@supabase/ssr`, `@supabase/supabase-js`).
 - The code was written in a sandbox that could not install npm packages, so it has been type-checked only against stand-in types. First real `npm install && npm run build` may surface small fixes.
 
 ## Conventions

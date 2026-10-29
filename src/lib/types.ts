@@ -47,6 +47,10 @@ export interface EventInfo {
   days: EventDay[];
   /** Minutes before a start time when bib pickup opens on race day */
   bibPickupMinutesBefore: number;
+  /** UTC ISO timestamp after which bib transfers are closed */
+  bibTransferDeadlineAt: string;
+  /** Where transfer requests are emailed */
+  bibTransferEmail: string;
   sourceNote: string;
 }
 
@@ -70,6 +74,22 @@ export interface Listing {
    * DEMO ONLY. In the real app the WhatsApp number lives in the Profile table
    * and is never sent to the browser; it is used only by a server redirect.
    */
+  contact?: string;
+}
+
+export type BibStatus = "ACTIVE" | "TAKEN";
+
+/** A runner offering to transfer their bib to someone in the same category. */
+export interface BibListing {
+  id: string;
+  ownerId: string;
+  categoryId: string;
+  note: string;
+  displayName: string;
+  status: BibStatus;
+  /** UTC ISO timestamp */
+  createdAt: string;
+  /** DEMO ONLY, like Listing.contact */
   contact?: string;
 }
 
