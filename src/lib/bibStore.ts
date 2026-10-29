@@ -1,33 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { fromBibRow, type BibRow } from "./db";
 import { getEvent } from "./event";
 import { getBrowserClient } from "./supabase/browser";
 import { supabaseEnabled } from "./supabase/config";
 import type { BibListing, BibStatus } from "./types";
-
-/** Row of public.bib_listings as the database returns it. */
-interface BibRow {
-  id: string;
-  owner_id: string;
-  category_id: string;
-  note: string;
-  display_name: string;
-  status: BibStatus;
-  created_at: string;
-}
-
-function fromRow(r: BibRow): BibListing {
-  return {
-    id: r.id,
-    ownerId: r.owner_id,
-    categoryId: r.category_id,
-    note: r.note,
-    displayName: r.display_name,
-    status: r.status,
-    createdAt: r.created_at,
-  };
-}
 
 /** Result of a write: null on success, otherwise a short message to show. */
 type WriteResult = Promise<string | null>;
@@ -74,7 +52,7 @@ function writeDemo(list: BibListing[]): void {
   }
 }
 
-function useDemoBibs() {
+function useDemoBibs(_initial?: BibListing[]) {
   const [mine, setMine] = useState<BibListing[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -128,6 +106,7 @@ function useDemoBibs() {
 
   return {
     ready,
+    fresh: ready,
     userId: DEMO_ME as string | null,
     mine,
     all: [...SEEDS, ...mine],
@@ -137,25 +116,28 @@ function useDemoBibs() {
   };
 }
 
-function useDbBibs() {
-  const [rows, setRows] = useState<BibListing[]>([]);
+function useDbBibs(initial?: BibListing[]) {
+  const [rows, setRows] = useState<BibListing[]>(initial ?? []);
   const [userId, setUserId] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(initial !== undefined);
+  const [fresh, setFresh] = useState(false);
   const eventId = getEvent().id;
 
   const refresh = useCallback(async () => {
     const sb = getBrowserClient();
+    // getSession reads the saved session locally (no network); RLS protects the data.
     const [{ data: auth }, { data, error }] = await Promise.all([
-      sb.auth.getUser(),
+      sb.auth.getSession(),
       sb
         .from("bib_listings")
         .select("*")
         .eq("event_id", eventId)
         .order("created_at", { ascending: false }),
     ]);
-    setUserId(auth.user?.id ?? null);
-    if (!error && data) setRows((data as BibRow[]).map(fromRow));
+    setUserId(auth.session?.user.id ?? null);
+    if (!error && data) setRows((data as BibRow[]).map(fromBibRow));
     setReady(true);
+    setFresh(true);
   }, [eventId]);
 
   useEffect(() => {
@@ -207,6 +189,7 @@ function useDbBibs() {
 
   return {
     ready,
+    fresh,
     userId,
     mine: userId ? rows.filter((b) => b.ownerId === userId) : [],
     all: rows,

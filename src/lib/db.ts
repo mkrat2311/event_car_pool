@@ -1,4 +1,4 @@
-import type { Leg, Listing, ListingStatus, ListingType, Place } from "./types";
+import type { BibListing, BibStatus, Leg, Listing, ListingStatus, ListingType, Place } from "./types";
 
 /** A row of public.listings as the database returns it. */
 export interface ListingRow {
@@ -67,5 +67,28 @@ export function toRow(l: Listing, eventId: string) {
     notes: l.notes,
     display_name: l.displayName,
     status: l.status,
+  };
+}
+
+/** A row of public.bib_listings as the database returns it. */
+export interface BibRow {
+  id: string;
+  owner_id: string;
+  category_id: string;
+  note: string;
+  display_name: string;
+  status: BibStatus;
+  created_at: string;
+}
+
+export function fromBibRow(r: BibRow): BibListing {
+  return {
+    id: r.id,
+    ownerId: r.owner_id,
+    categoryId: r.category_id,
+    note: r.note,
+    displayName: r.display_name,
+    status: r.status,
+    createdAt: r.created_at,
   };
 }

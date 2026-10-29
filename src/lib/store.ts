@@ -41,7 +41,7 @@ function writeJson(key: string, value: unknown): void {
 /** Result of a write: null on success, otherwise a short message to show. */
 type WriteResult = Promise<string | null>;
 
-function useDemoListings() {
+function useDemoListings(_initial?: Listing[]) {
   const [mine, setMine] = useState<Listing[]>([]);
   const [ready, setReady] = useState(false);
 
@@ -85,6 +85,7 @@ function useDemoListings() {
 
   return {
     ready,
+    fresh: ready,
     userId: ME as string | null,
     mine,
     all: [...SEED_LISTINGS, ...mine],
@@ -94,21 +95,25 @@ function useDemoListings() {
   };
 }
 
-function useDbListings() {
-  const [rows, setRows] = useState<Listing[]>([]);
+function useDbListings(initial?: Listing[]) {
+  const [rows, setRows] = useState<Listing[]>(initial ?? []);
   const [userId, setUserId] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(initial !== undefined);
+  // true once the browser has loaded its own copy (the server copy can be up to 15 s old)
+  const [fresh, setFresh] = useState(false);
   const eventId = getEvent().id;
 
   const refresh = useCallback(async () => {
     const sb = getBrowserClient();
+    // getSession reads the saved session locally (no network); RLS protects the data.
     const [{ data: auth }, { data, error }] = await Promise.all([
-      sb.auth.getUser(),
+      sb.auth.getSession(),
       sb.from("listings").select("*").eq("event_id", eventId).order("depart_at"),
     ]);
-    setUserId(auth.user?.id ?? null);
+    setUserId(auth.session?.user.id ?? null);
     if (!error && data) setRows((data as ListingRow[]).map(fromRow));
     setReady(true);
+    setFresh(true);
   }, [eventId]);
 
   useEffect(() => {
@@ -152,6 +157,7 @@ function useDbListings() {
 
   return {
     ready,
+    fresh,
     userId,
     mine: userId ? rows.filter((l) => l.ownerId === userId) : [],
     all: rows,

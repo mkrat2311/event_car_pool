@@ -45,6 +45,11 @@ Shared only inside the event's WhatsApp group. Built as a multi-event platform; 
 - Find shows all rides for a trip with no distance filter (riders can be picked up midway). Keep lat/lng on every listing for maps.
 - Keep the Google API key server-side where possible and restrict it by referrer/API.
 
+## Performance
+- Supabase is in `ap-southeast-2` (Sydney), so every browser query from India is slow. `vercel.json` pins functions to `syd1` to sit next to it. If the project ever moves to Mumbai (`ap-south-1`), change this to `bom1`.
+- Find, Ride and Bib pages are rendered on the server with the public list already in them (cached 15 s, `src/lib/serverData.ts`); the browser refreshes right after. The ride page waits for `fresh` before saying "not found".
+- The middleware runs only on `/connect/*`. Browser code reads the session locally (`getSession`); the server uses `getUser` where it matters.
+
 ## Google Cloud
 - Project name `event_car_pool`, project ID `event-car-pool` (IDs cannot contain underscores). Owner: mkrat2311@gmail.com.
 - OAuth consent screen app name: "Event Car Pool". APIs: Places API (New), Maps Embed API (route map on the ride page, free); Google sign-in via Supabase. The browser key must allow both APIs.

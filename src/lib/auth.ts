@@ -24,8 +24,9 @@ export function useAuth() {
   useEffect(() => {
     if (!supabaseEnabled) return;
     const sb = getBrowserClient();
-    void sb.auth.getUser().then(({ data }) => {
-      setUser(toUser(data.user));
+    // Local read of the saved session: no network wait. RLS protects the data.
+    void sb.auth.getSession().then(({ data }) => {
+      setUser(toUser(data.session?.user ?? null));
       setReady(true);
     });
     const { data } = sb.auth.onAuthStateChange((_event, session) => {

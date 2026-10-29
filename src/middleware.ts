@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseEnabled } from "@/lib/supabase/config";
 
-/** Keeps the Google session fresh. Does nothing in demo mode. */
+/** Refreshes the Google session before the chat redirect. Does nothing in demo mode. */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
   if (!supabaseEnabled) return response;
@@ -25,6 +25,8 @@ export async function middleware(request: NextRequest) {
   return response;
 }
 
+// Only the chat redirect reads the session on the server. Running this on every
+// page would add a network wait to each visit; the browser keeps its own session fresh.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/connect/:path*"],
 };
