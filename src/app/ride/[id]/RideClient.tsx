@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { BackIcon, ChatIcon } from "@/components/Icons";
 import RouteMap from "@/components/RouteMap";
 import { getEvent } from "@/lib/event";
-import { initial, seatsLabel } from "@/lib/format";
+import { initial as initialOf, seatsLabel } from "@/lib/format";
 import { reportListing, useListings, whatsappUrl } from "@/lib/store";
 import { supabaseEnabled } from "@/lib/supabase/config";
 import { fmtDate, fmtTime } from "@/lib/time";
@@ -96,7 +96,7 @@ export default function RideClient({ initial }: { initial?: Listing[] }) {
       <main className="page" style={{ gap: 12, paddingTop: 8 }}>
         <div className="card" style={{ padding: 16 }}>
           <div className="row" style={{ padding: 0 }}>
-            <span className="avatar lg">{initial(listing.displayName)}</span>
+            <span className="avatar lg">{initialOf(listing.displayName)}</span>
             <div className="grow">
               <div className="strong" style={{ fontSize: 18 }}>
                 {listing.displayName}
